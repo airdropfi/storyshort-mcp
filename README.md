@@ -2,7 +2,7 @@
 
 [![Official MCP Registry](https://img.shields.io/badge/MCP%20Registry-app.storyshort%2Fstoryshort-blue)](https://registry.modelcontextprotocol.io/v0.1/servers?search=storyshort)
 
-Turn a story idea into a narrated faceless short video (script, AI voiceover, AI scene images, captions) from any AI assistant that speaks MCP. This repository is the public home of the **remote MCP server** of [StoryShort](https://storyshort.app): a hosted endpoint, so there is nothing to install or run.
+Turn a story idea into a narrated faceless short video (script, AI voiceover, AI scene images, captions) from any AI assistant that speaks MCP. The primary way to use it is the **hosted remote MCP server** of [StoryShort](https://storyshort.app) (nothing to install). This repository also holds the MIT-licensed source of the **local stdio server** (`@storyshort/mcp-server` on npm), which wraps the StoryShort public API `/api/v1` with a smaller set of tools than the hosted server.
 
 StoryShort (storyshort.app) is independent of storyshort.ai, a different company.
 
@@ -10,6 +10,7 @@ StoryShort (storyshort.app) is independent of storyshort.ai, a different company
 - **Registry name:** `app.storyshort/storyshort` ([Official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=storyshort))
 - **Auth:** OAuth 2.0 with PKCE and dynamic client registration (discovered from `/.well-known/oauth-protected-resource`), or a StoryShort API key as `Authorization: Bearer sk_live_...`
 - **Docs and API keys:** https://storyshort.app/en/developers
+- **Also on npm** as a stdio server: `npx -y @storyshort/mcp-server` with `STORYSHORT_API_KEY` set (source in `src/`)
 
 ## What you need
 
@@ -61,6 +62,15 @@ Rules the server enforces: a draft is free and renders nothing; a render that th
 - Gemini CLI extension: https://github.com/airdropfi/storyshort-gemini-extension
 - Privacy: https://storyshort.app/en/privacy · Terms: https://storyshort.app/en/terms · Support: support@storyshort.app
 
+## Run the stdio server from source
+
+```bash
+npm ci && npm run build
+STORYSHORT_API_KEY=sk_live_... node dist/index.js      # or: docker build -t storyshort-mcp . && docker run -i -e STORYSHORT_API_KEY storyshort-mcp
+```
+
+The stdio server registers 8 tools (generate video, get video, list videos, list niches, credit balance, usage stats, subscription, list API keys), 2 prompts and 2 resources. Without an API key it still starts and answers `tools/list` (no network needed), but every tool call is refused until a key is set. The hosted remote server above exposes the fuller tool set listed in the table.
+
 ## About this repository
 
-It holds the registry metadata (`server.json`, identical to the published registry entry) and documentation. The server itself is closed source and runs at storyshort.app. MIT license covers the contents of this repository.
+It holds the registry metadata (`server.json`, identical to the published registry entry), documentation and the source of the stdio server (`src/`, `tests/`, `Dockerfile`). The hosted server's own code runs at storyshort.app and is closed source. MIT license covers the contents of this repository.
